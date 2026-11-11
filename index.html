@@ -4,218 +4,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGR - Sistema Integral de Gestión de Restaurante</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased">
-    <div class="flex h-screen overflow-hidden">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f1f5f9; color: #334155; display: flex; height: 100vh; overflow: hidden; }
         
-        <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between p-4 shadow-xl">
+        /* Sidebar Navigation */
+        aside { width: 260px; background-color: #0f172a; color: #94a3b8; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
+        .logo-box { display: flex; items-center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
+        .logo-icon { background-color: #4f46e5; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
+        .logo-text h1 { font-size: 16px; color: white; font-weight: 700; }
+        .logo-text span { font-size: 11px; color: #818cf8; font-family: monospace; }
+        
+        nav { display: flex; flex-direction: column; gap: 6px; }
+        .nav-btn { background: none; border: none; color: #94a3b8; text-align: left; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-btn:hover, .nav-btn.active { background-color: #1e293b; color: white; }
+        .nav-btn.active { background-color: #4f46e5; }
+        
+        .baseline-badge { background-color: #1e293b; padding: 12px; border-radius: 10px; border: 1px solid #334155; font-size: 12px; }
+        .baseline-badge .commit { font-family: monospace; color: #34d399; font-weight: bold; margin-top: 4px; }
+
+        /* Main Content */
+        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        header { background-color: white; border-bottom: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        header h2 { font-size: 20px; color: #0f172a; font-weight: 700; }
+        header p { font-size: 12px; color: #64748b; }
+        .user-tag { background-color: #e0e7ff; color: #3730a3; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+        .content { padding: 32px; flex: 1; }
+        
+        /* Dashboard Metrics Cards */
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
+        .card { background-color: white; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card .title { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+        .card .value { font-size: 24px; font-weight: 800; color: #0f172a; margin: 8px 0; }
+        .card .subtext { font-size: 12px; color: #10b981; font-weight: 600; }
+        .card .subtext.amber { color: #d97706; }
+        .card .subtext.indigo { color: #4f46e5; }
+
+        /* Table Design */
+        .table-container { background-color: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .table-header { padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+        .table-header h3 { font-size: 16px; font-weight: 700; color: #0f172a; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: #f8fafc; color: #475569; padding: 12px 20px; font-size: 11px; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        .status-pill { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .status-pill.amber { background-color: #fef3c7; color: #b45309; }
+        .status-pill.emerald { background-color: #d1fae5; color: #047857; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .placeholder-box { background: white; padding: 60px; text-align: center; border-radius: 12px; border: 1px solid #e2e8f0; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside>
+        <div>
+            <div class="logo-box">
+                <div class="logo-icon">🍽️</div>
+                <div class="logo-text">
+                    <h1>SIGR System</h1>
+                    <span>v1.0.0-baseline</span>
+                </div>
+            </div>
+
+            <nav>
+                <button onclick="switchTab('dashboard', this)" class="nav-btn active">📊 Dashboard General</button>
+                <button onclick="switchTab('pedidos', this)" class="nav-btn">🔔 Pedidos y Comandas</button>
+                <button onclick="switchTab('reservas', this)" class="nav-btn">📅 Reservas de Mesas</button>
+                <button onclick="switchTab('menu', this)" class="nav-btn">📖 Menú Digital (CRUD)</button>
+                <button onclick="switchTab('caja', this)" class="nav-btn">💰 Cierre de Caja</button>
+                <button onclick="switchTab('usuarios', this)" class="nav-btn">⚙️ Usuarios y Roles</button>
+            </nav>
+        </div>
+
+        <div class="baseline-badge">
+            <div style="color: #94a3b8;">Línea Base Activa:</div>
+            <div class="commit">Commit: a93b4f1</div>
+            <div style="margin-top: 6px; font-size: 11px; color: #34d399; font-weight: bold;">Estado: FROZEN</div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+        <header>
             <div>
-                <div class="flex items-center gap-3 px-2 py-4 mb-6 border-b border-slate-800">
-                    <div class="bg-indigo-600 text-white p-2 rounded-lg font-bold">
-                        <i class="fa-solid fa-utensils text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-white tracking-wide">SIGR System</h1>
-                        <span class="text-xs text-indigo-400 font-mono">v1.0.0-baseline</span>
-                    </div>
-                </div>
-
-                <nav class="space-y-1">
-                    <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 text-white bg-slate-800">
-                        <i class="fa-solid fa-chart-pie w-5"></i> Dashboard General
-                    </button>
-                    <button onclick="switchTab('pedidos')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-bell-concierge w-5"></i> Pedidos y Comandas
-                    </button>
-                    <button onclick="switchTab('reservas')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-calendar-check w-5"></i> Reservas de Mesas
-                    </button>
-                    <button onclick="switchTab('menu')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-book-open w-5"></i> Menú Digital (CRUD)
-                    </button>
-                    <button onclick="switchTab('caja')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-cash-register w-5"></i> Cierre de Caja
-                    </button>
-                    <button onclick="switchTab('usuarios')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-users-gear w-5"></i> Usuarios y Roles
-                    </button>
-                </nav>
+                <h2 id="page-title">Dashboard Operativo</h2>
+                <p>Monitoreo en tiempo real del sistema gastronómico</p>
             </div>
+            <div class="user-tag">🛡️ Rol: Administrador</div>
+        </header>
 
-            <!-- Profile / Info Base -->
-            <div class="p-3 bg-slate-800/60 rounded-xl border border-slate-700/50">
-                <div class="text-xs text-slate-400">Línea Base Activa:</div>
-                <div class="text-xs font-mono text-emerald-400 font-bold truncate">Commit: a93b4f1</div>
-                <div class="mt-2 pt-2 border-t border-slate-700 text-[11px] text-slate-400 flex justify-between">
-                    <span>Estado:</span>
-                    <span class="text-emerald-400 font-bold">FROZEN</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto flex flex-col">
-            <!-- Header Bar -->
-            <header class="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
-                <div>
-                    <h2 id="page-title" class="text-xl font-bold text-slate-800">Dashboard Operativo</h2>
-                    <p class="text-xs text-slate-500">Monitoreo en tiempo real del sistema gastronómico</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-full border border-indigo-200">
-                        <i class="fa-solid fa-user-shield mr-1"></i> Rol: Administrador
-                    </span>
-                    <button onclick="alert('Línea Base v1.0.0 validada correctamente.')" class="bg-slate-900 text-white text-xs px-4 py-2 rounded-lg hover:bg-slate-800 font-medium transition">
-                        Audit SCM
-                    </button>
-                </div>
-            </header>
-
-            <!-- Content Body -->
-            <div class="p-8 flex-1">
-                
-                <!-- TAB 1: DASHBOARD -->
-                <div id="tab-dashboard" class="tab-content space-y-6">
-                    <!-- Metrics Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                            <div class="text-slate-500 text-xs font-medium">Ventas del Día</div>
-                            <div class="text-2xl font-bold text-slate-800 mt-1">$ 1,450.00</div>
-                            <div class="text-xs text-emerald-600 mt-2 font-medium"><i class="fa-solid fa-arrow-up"></i> +12% vs ayer</div>
-                        </div>
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                            <div class="text-slate-500 text-xs font-medium">Pedidos Activos</div>
-                            <div class="text-2xl font-bold text-amber-600 mt-1">8 Comandas</div>
-                            <div class="text-xs text-amber-600 mt-2 font-medium">3 En cocina / 5 Listos</div>
-                        </div>
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                            <div class="text-slate-500 text-xs font-medium">Reservas Hoy</div>
-                            <div class="text-2xl font-bold text-indigo-600 mt-1">14 Mesas</div>
-                            <div class="text-xs text-slate-500 mt-2">Capacidad al 78%</div>
-                        </div>
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                            <div class="text-slate-500 text-xs font-medium">Platos en Menú</div>
-                            <div class="text-2xl font-bold text-slate-800 mt-1">42 Ítems</div>
-                            <div class="text-xs text-emerald-600 mt-2 font-medium">Todas las cat. activas</div>
-                        </div>
-                    </div>
-
-                    <!-- Live Orders Table preview -->
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
-                            <h3 class="font-bold text-slate-800">Últimos Pedidos Registrados</h3>
-                            <button onclick="switchTab('pedidos')" class="text-xs text-indigo-600 font-semibold hover:underline">Ver todos los pedidos &rarr;</button>
-                        </div>
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold">
-                                <tr>
-                                    <th class="p-4">ID Pedido</th>
-                                    <th class="p-4">Mesa / Cliente</th>
-                                    <th class="p-4">Detalle</th>
-                                    <th class="p-4">Total</th>
-                                    <th class="p-4">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                <tr>
-                                    <td class="p-4 font-mono font-medium text-slate-800">#ORD-094</td>
-                                    <td class="p-4">Mesa 04 (Mesero: Juan)</td>
-                                    <td class="p-4">2x Lomo Saltado, 1x Chicha Morada</td>
-                                    <td class="p-4 font-bold text-slate-800">$ 45.00</td>
-                                    <td class="p-4"><span class="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">En Preparación</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 font-mono font-medium text-slate-800">#ORD-093</td>
-                                    <td class="p-4">Mesa 12 (Mesero: Maria)</td>
-                                    <td class="p-4">1x Ceviche Clásico, 2x Cerveza Artesanal</td>
-                                    <td class="p-4 font-bold text-slate-800">$ 38.50</td>
-                                    <td class="p-4"><span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">Listo para Entregar</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- TAB 2: PEDIDOS -->
-                <div id="tab-pedidos" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-slate-800">Módulo de Pedidos en Tiempo Real</h3>
-                        <button onclick="alert('Nueva comanda registrada')" class="bg-indigo-600 text-white text-xs px-4 py-2 rounded-lg font-medium hover:bg-indigo-700">
-                            + Crear Comanda
-                        </button>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
-                        <i class="fa-solid fa-list-check text-4xl mb-3 text-slate-300"></i>
-                        <p class="font-medium">Gestión de comandas y seguimiento de cocina activo en commit <code class="bg-slate-100 px-2 py-1 rounded text-indigo-600">a93b4f1</code>.</p>
-                    </div>
-                </div>
-
-                <!-- TAB 3: RESERVAS -->
-                <div id="tab-reservas" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-slate-800">Gestión de Reservas de Mesas</h3>
-                        <button class="bg-indigo-600 text-white text-xs px-4 py-2 rounded-lg font-medium hover:bg-indigo-700">+ Nueva Reserva</button>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
-                        <i class="fa-solid fa-calendar-days text-4xl mb-3 text-slate-300"></i>
-                        <p class="font-medium">Módulo de reservas por fecha/hora validado en Baseline v1.0.0.</p>
-                    </div>
-                </div>
-
-                <!-- TAB 4: MENU CRUD -->
-                <div id="tab-menu" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-slate-800">Administración de Menú Gastronómico</h3>
-                        <button class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-medium hover:bg-emerald-700">+ Nuevo Plato</button>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
-                        <i class="fa-solid fa-utensils text-4xl mb-3 text-slate-300"></i>
-                        <p class="font-medium">CRUD de Categorías y Platos habilitado correctamente.</p>
-                    </div>
-                </div>
-
-                <!-- TAB 5: CAJA -->
-                <div id="tab-caja" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-slate-800">Cierre de Caja y Facturación Diario</h3>
-                        <button class="bg-slate-900 text-white text-xs px-4 py-2 rounded-lg font-medium hover:bg-slate-800">Generar Arqueo PDF</button>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
-                        <i class="fa-solid fa-receipt text-4xl mb-3 text-slate-300"></i>
-                        <p class="font-medium">Servicio de facturación simplificada y reporte contable listo.</p>
-                    </div>
-                </div>
-
-                <!-- TAB 6: USUARIOS -->
-                <div id="tab-usuarios" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-slate-800">Control de Usuarios y Roles (RBAC)</h3>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
-                        <i class="fa-solid fa-user-shield text-4xl mb-3 text-slate-300"></i>
-                        <p class="font-medium">Autenticación JWT y Roles: Admin, Mesero, Cajero, Cliente.</p>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-    </div>
-
-    <!-- Simple Tab Switching JS -->
-    <script>
-        function switchTab(tabId) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+        <div class="content">
             
-            // Show target tab
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="metrics-grid">
+                    <div class="card">
+                        <div class="title">Ventas del Día</div>
+                        <div class="value">$ 1,450.00</div>
+                        <div class="subtext">▲ +12% vs ayer</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">Pedidos Activos</div>
+                        <div class="value" style="color: #d97706;">8 Comandas</div>
+                        <div class="subtext amber">3 En cocina / 5 Listos</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">Reservas Hoy</div>
+                        <div class="value" style="color: #4f46e5;">14 Mesas</div>
+                        <div class="subtext indigo">Capacidad al 78%</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">Platos en Menú</div>
+                        <div class="value">42 Ítems</div>
+                        <div class="subtext">Todas las cat. activas</div>
+                    </div>
+                </div>
 
-            // Update Title
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Últimos Pedidos Registrados</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Pedido</th>
+                                <th>Mesa / Cliente</th>
+                                <th>Detalle del Pedido</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-family: monospace; font-weight: bold;">#ORD-094</td>
+                                <td>Mesa 04 (Mesero: Juan)</td>
+                                <td>2x Lomo Saltado, 1x Chicha Morada</td>
+                                <td style="font-weight: bold;">$ 45.00</td>
+                                <td><span class="status-pill amber">En Preparación</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: monospace; font-weight: bold;">#ORD-093</td>
+                                <td>Mesa 12 (Mesero: Maria)</td>
+                                <td>1x Ceviche Clásico, 2x Cerveza Artesanal</td>
+                                <td style="font-weight: bold;">$ 38.50</td>
+                                <td><span class="status-pill emerald">Listo para Entregar</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- OTHER TABS -->
+            <div id="tab-pedidos" class="tab-content">
+                <div class="placeholder-box">
+                    <h2>🔔 Módulo de Pedidos y Comandas</h2>
+                    <p style="margin-top: 10px;">Gestión de comandas en tiempo real validada en commit <code style="color: #4f46e5;">a93b4f1</code>.</p>
+                </div>
+            </div>
+
+            <div id="tab-reservas" class="tab-content">
+                <div class="placeholder-box">
+                    <h2>📅 Módulo de Reservas de Mesas</h2>
+                    <p style="margin-top: 10px;">Control de agenda e inventario de mesas activado en Baseline v1.0.0.</p>
+                </div>
+            </div>
+
+            <div id="tab-menu" class="tab-content">
+                <div class="placeholder-box">
+                    <h2>📖 Gestión de Menú Digital (CRUD)</h2>
+                    <p style="margin-top: 10px;">Administración de platos, precios y categorías gastronómicas.</p>
+                </div>
+            </div>
+
+            <div id="tab-caja" class="tab-content">
+                <div class="placeholder-box">
+                    <h2>💰 Módulo de Cierre de Caja y Facturación</h2>
+                    <p style="margin-top: 10px;">Arqueo contable, comprobantes y reportes diarios en PDF.</p>
+                </div>
+            </div>
+
+            <div id="tab-usuarios" class="tab-content">
+                <div class="placeholder-box">
+                    <h2>⚙️ Control de Usuarios y Roles (RBAC)</h2>
+                    <p style="margin-top: 10px;">Seguridad JWT habilitada para roles: Admin, Mesero, Cajero, Cliente.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            element.classList.add('active');
+
             const titles = {
                 'dashboard': 'Dashboard Operativo',
                 'pedidos': 'Registro y Seguimiento de Pedidos',
